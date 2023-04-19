@@ -41,18 +41,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LimonadaTextoImagem(modifier: Modifier = Modifier) {
+fun LimonadaTextoImagem(
+                        recursoTextoId: Int,
+                        recursoImagemId: Int,
+                        onImagemClick:() ->Unit,
+                        modifier: Modifier = Modifier
+) {
 
-    var descricao = stringResource(id = R.string.Limao)
-
-    var resultado by remember { mutableStateOf(1) }
-
-    var imagem =  when(resultado){
-        1 -> R.drawable.lemon_tree
-        2 -> R.drawable.lemon_squeeze
-        3 -> R.drawable.lemon_drink
-        else -> R.drawable.lemon_restart
-    }
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -60,25 +55,20 @@ fun LimonadaTextoImagem(modifier: Modifier = Modifier) {
     ) {
 
         Text(
-            text = descricao,
+            text = stringResource(id = recursoTextoId),
             fontSize = 18.sp
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Image(
-            painter = painterResource(id = imagem),
-            contentDescription = descricao,
+            painter = painterResource(id = recursoImagemId),
+            contentDescription = null,
 
             modifier = Modifier
                 .wrapContentSize()
-                .clickable {
-                    if(resultado>5)
-                        resultado++
-                    else
-                        resultado=1
-                }
-                .border(2.dp, Color(105,205,216), RoundedCornerShape(10.dp))
+                .clickable(onClick = onImagemClick)
+                .border(2.dp, Color(105, 205, 216), shape = RoundedCornerShape(10.dp))
                 .padding(16.dp)
             
         )
@@ -88,5 +78,47 @@ fun LimonadaTextoImagem(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun LimonadaApp() {
-    LimonadaTextoImagem()
+
+    var passoAtual by remember { mutableStateOf(1) }
+    var quantidadeDeEspremidas by remember { mutableStateOf(0) }
+
+    when(passoAtual){
+        1 ->{
+            LimonadaTextoImagem(
+                R.string.Limoeiro,
+                R.drawable.lemon_tree,
+                onImagemClick = {
+                    passoAtual = 2
+                    quantidadeDeEspremidas = (2..4).random()
+                }
+            )
+        }
+        2 ->{
+            LimonadaTextoImagem(
+                R.string.Limao,
+                R.drawable.lemon_squeeze,
+                onImagemClick = {
+                    quantidadeDeEspremidas--
+                    quantidadeDeEspremidas--
+                    if(quantidadeDeEspremidas==0)
+                        passoAtual = 3
+                }
+            )
+
+        }
+        3 ->{
+            LimonadaTextoImagem(
+                R.string.copo_de_limonada,
+                R.drawable.lemon_drink,
+                onImagemClick = { passoAtual = 4 }
+            )
+        }
+        4 ->{
+            LimonadaTextoImagem(
+                R.string.copo_vazio,
+                R.drawable.lemon_restart,
+                onImagemClick = { passoAtual = 1 }
+            )
+        }
+    }
 }
